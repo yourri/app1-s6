@@ -5,6 +5,7 @@ import numpy, fiddle
 def curl_E(E):
     curl_E = numpy.zeros(E.shape)
     curl_E[:, :-1, :, 0] += E[:, 1:, :, 2] - E[:, :-1, :, 2]
+    print(curl_E[:, :-1, :, 0])
     curl_E[:, :, :-1, 0] -= E[:, :, 1:, 1] - E[:, :, :-1, 1]
 
     curl_E[:, :, :-1, 1] += E[:, :, 1:, 0] - E[:, :, :-1, 0]
@@ -30,6 +31,7 @@ def curl_H(H):
 
 def timestep(E, H, courant_number, source_pos, source_val):
     E += courant_number * curl_H(H)
+    # multiplier l'amplitude par tout les nombres générés dans le curl_H
     E[source_pos] += source_val
     H -= courant_number * curl_E(E)
     return E, H
@@ -38,13 +40,23 @@ def timestep(E, H, courant_number, source_pos, source_val):
 class WaveEquation:
     def __init__(self, s, courant_number, source):
         s = s + (3,)
+        # s = (n, n, n, 3)
         self.E = numpy.zeros(s)
         self.H = numpy.zeros(s)
+        # Zeros de (100, 100, 100, 3)
         self.courant_number = courant_number
+        # Au debut, il est a 0.1
         self.source = source
+        # Amplitude * position en degres (return ([n // 3], [n // 3], [n // 2],[0]), 0.1*numpy.sin(0.1 * index
         self.index = 0
 
     def __call__(self, figure, field_component, slice, slice_index, initial=False):
+        print("Field component: " + str(field_component))
+        # Field component : Ex = 0, Ey = 1, Ez = 2, Hx = 3, Hy = 4, Hz = 5
+        # Figure : Pas besoin de le mettre
+        # Slice : Xy : 2, Yz : 0, Xz :  1
+        # slice index : Valeur qui varie entre 0 et 99
+        print("slice" + str(slice))
         if field_component < 3:
             field = self.E
         else:
@@ -75,7 +87,7 @@ if __name__ == "__main__":
 
     def source(index):
         return ([n // 3], [n // 3], [n // 2],[0]), 0.1*numpy.sin(0.1 * index)
-
+    
 
     w = WaveEquation((n, n, n), 0.1, source)
     fiddle.fiddle(w, [('field component',{'Ex':0,'Ey':1,'Ez':2, 'Hx':3,'Hy':4,'Hz':5}),('slice',{'XY':2,'YZ':0,'XZ':1}),('slice index',0,n-1,n//2,1)], update_interval=0.01)
