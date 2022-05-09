@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     va4d E = create_buffer(100);
     va4d H = create_buffer(100);
     for(int i = 0; i < 50; i++) {
-        E += curl_E(E);
+        E += (curl_E(E)) * create_buffer(0.1, n) ;
         H = curl_H(H);
         
     }
@@ -156,8 +156,8 @@ void print_va4d(va4d val_array){
     cout <<"]";
 }
 
-va4d create_buffer(int n){
-    valarray<int> index(0,3);
+va4d create_buffer(int value, int n){
+    valarray<int> index(value,3);
     va2d line(index, n);
     va3d colonne(line, n);
     va4d width(colonne, n);
