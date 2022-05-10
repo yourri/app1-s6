@@ -3,10 +3,10 @@
 #include <valarray>
 using namespace std;
 
-typedef valarray<valarray<valarray<valarray<int>>>> va4d;
-typedef valarray<valarray<valarray<int>>> va3d;
-typedef valarray<valarray<int>> va2d;
-va4d create_buffer(int n);
+typedef valarray<valarray<valarray<valarray<float>>>> va4d;
+typedef valarray<valarray<valarray<float>>> va3d;
+typedef valarray<valarray<float>> va2d;
+va4d create_buffer(float value, int n);
 va4d curl_E(va4d E);
 va4d curl_H(va4d H);
 void print_va4d(va4d val_array);
@@ -18,19 +18,19 @@ int main(int argc, char** argv)
     int n = 100;
     int source_pos[] = {33,33,50};
     int source_wave = 0.1*sin(0.1*index);
-    va4d E = create_buffer(100);
-    va4d H = create_buffer(100);
+    va4d E = create_buffer(0, 100);
+    va4d H = create_buffer(0, 100);
     for(int i = 0; i < 50; i++) {
-        E += (curl_E(E)) * create_buffer(0.1, n) ;
-        H = curl_H(H);
-        
+        cout << i << endl;
+        E += (curl_E(E)) * create_buffer(0.1, n);
+        H -= (curl_H(H)) * create_buffer(0.1, n);
     }
     //print_va4d(curl_E_object);
     return 0;
 }
 
 va4d curl_E(va4d val_array){
-    va4d curl_E  = create_buffer(100);
+    va4d curl_E  = create_buffer(0, 100);
     // Curl 1 de E
     for(int width=0; width<val_array.size(); width++){
         for(int colonne=0; colonne<val_array[width].size()-1; colonne--){
@@ -84,7 +84,7 @@ va4d curl_E(va4d val_array){
 }
 
 va4d curl_H(va4d val_array) {
-    va4d curl_H  = create_buffer(100);
+    va4d curl_H  = create_buffer(0, 100);
     // Curl 1 de H
     for(int width=0; width<val_array.size(); width++){
         for(int colonne=0; colonne<val_array[width].size() - 1; colonne--){
@@ -156,8 +156,8 @@ void print_va4d(va4d val_array){
     cout <<"]";
 }
 
-va4d create_buffer(int value, int n){
-    valarray<int> index(value,3);
+va4d create_buffer(float value, int n){
+    valarray<float> index(value,3);
     va2d line(index, n);
     va3d colonne(line, n);
     va4d width(colonne, n);
